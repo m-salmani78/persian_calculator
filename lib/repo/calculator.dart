@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class Calculator {
+class Calculator extends ChangeNotifier {
   final TextEditingController controller;
   String finalResult = '';
   List<String> numbers = [];
@@ -16,9 +16,9 @@ class Calculator {
         return '${num1 + num2}';
       case '-':
         return '${num1 - num2}';
-      case '*':
+      case '×':
         return '${num1 * num2}';
-      case '/':
+      case '÷':
         return '${num1 / num2}';
       default:
         return '0';
@@ -26,14 +26,31 @@ class Calculator {
   }
 
   void addNum(String value) {
-    if (finalResult.isEmpty || finalResult == '0') {
+    assert(value.length == 1);
+    assert(value.compareTo('0') >= 0 && value.compareTo('9') <= 0);
+    if (finalResult.isEmpty) {
       finalResult = value;
     } else if (operators.isEmpty) {
-      finalResult = finalResult + value;
+      finalResult += value;
     } else if (numbers.isNotEmpty && numbers.length >= operators.length) {
       numbers[numbers.length - 1] += value;
     } else {
       numbers.add(value);
+    }
+    controller.text = toString();
+  }
+
+  void addDot() {
+    if (finalResult.isEmpty) {
+      finalResult = '0.';
+    } else if (operators.isEmpty) {
+      if (finalResult.contains('.')) return;
+      finalResult += '.';
+    } else if (numbers.isNotEmpty && numbers.length >= operators.length) {
+      if (numbers[numbers.length - 1].contains('.')) return;
+      numbers[numbers.length - 1] += '.';
+    } else {
+      numbers.add('0.');
     }
     controller.text = toString();
   }
@@ -48,8 +65,8 @@ class Calculator {
     controller.text = toString();
   }
 
-  String calculateResult() {
-    if (numbers.isEmpty) return finalResult;
+  void calculateResult() {
+    if (numbers.isEmpty) return;
     if (numbers.length != operators.length) throw Exception('invalid input');
     int index = _findOperator('*', '/');
     while (index >= 0) {
@@ -68,8 +85,7 @@ class Calculator {
     finalResult = result;
     numbers.clear();
     operators.clear();
-    controller.text = result;
-    return result;
+    notifyListeners();
   }
 
   int _findOperator(String opr1, String opr2) {
@@ -105,7 +121,8 @@ class Calculator {
     finalResult = '';
     numbers.clear();
     operators.clear();
-    controller.text = '0';
+    controller.clear();
+    notifyListeners();
   }
 
   @override

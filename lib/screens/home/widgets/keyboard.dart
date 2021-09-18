@@ -1,31 +1,32 @@
 import 'package:calculator/repo/calculator.dart';
 import 'package:calculator/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class CustomKeyboard extends StatelessWidget {
-  final Calculator calculator;
   final _mainAxisAlignment = MainAxisAlignment.spaceBetween;
 
-  const CustomKeyboard({Key? key, required this.calculator}) : super(key: key);
+  const CustomKeyboard({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final calculator = context.watch<Calculator>();
     return Column(
       children: [
-        _buildFirstRow(),
+        _buildFirstRow(calculator),
         const SizedBox(height: 8),
-        _buildNum7to9(),
+        _buildNum7to9(calculator),
         const SizedBox(height: 8),
-        _buildNum4to6(),
+        _buildNum4to6(calculator),
         const SizedBox(height: 8),
-        _buildNum1to3(),
+        _buildNum1to3(calculator),
         const SizedBox(height: 8),
-        _buildOtherNums(),
+        _buildOtherNums(calculator),
       ],
     );
   }
 
-  Widget _buildFirstRow() {
+  Widget _buildFirstRow(Calculator calculator) {
     return Row(
       mainAxisAlignment: _mainAxisAlignment,
       children: [
@@ -36,64 +37,58 @@ class CustomKeyboard extends StatelessWidget {
           child: const Text('C'),
           primary: Colors.red,
         ),
-        CustomButton(onPressed: () {}, child: const Text('()')),
-        CustomButton(onPressed: () {}, child: const Text('%')),
         CustomButton(
             onPressed: () {
-              calculator.addOperator('/');
+              //todo
             },
-            child: const Text('/')),
+            child: const Text('()')),
+        CustomButton(
+            onPressed: () {
+              //todo
+            },
+            child: const Text('%')),
+        CustomButton(
+            onPressed: () {
+              calculator.addOperator('÷');
+            },
+            child: const Text('÷')),
       ],
     );
   }
 
-  _buildNum7to9() {
+  _buildNum7to9(Calculator calculator) {
     return Row(
       mainAxisAlignment: _mainAxisAlignment,
       children: [
+        ...List.generate(
+          3,
+          (index) => CustomButton(
+              onPressed: () {
+                calculator.addNum('${index + 7}');
+              },
+              child: Text('${index + 7}')),
+        ),
         CustomButton(
             onPressed: () {
-              calculator.addNum('7');
+              calculator.addOperator('×');
             },
-            child: const Text('7')),
-        CustomButton(
-            onPressed: () {
-              calculator.addNum('8');
-            },
-            child: const Text('8')),
-        CustomButton(
-            onPressed: () {
-              calculator.addNum('9');
-            },
-            child: const Text('9')),
-        CustomButton(
-            onPressed: () {
-              calculator.addOperator('*');
-            },
-            child: const Text('*')),
+            child: const Text('×')),
       ],
     );
   }
 
-  _buildNum4to6() {
+  _buildNum4to6(Calculator calculator) {
     return Row(
       mainAxisAlignment: _mainAxisAlignment,
       children: [
-        CustomButton(
-            onPressed: () {
-              calculator.addNum('4');
-            },
-            child: const Text('4')),
-        CustomButton(
-            onPressed: () {
-              calculator.addNum('5');
-            },
-            child: const Text('5')),
-        CustomButton(
-            onPressed: () {
-              calculator.addNum('6');
-            },
-            child: const Text('6')),
+        ...List.generate(
+          3,
+          (index) => CustomButton(
+              onPressed: () {
+                calculator.addNum('${index + 4}');
+              },
+              child: Text('${index + 4}')),
+        ),
         CustomButton(
             onPressed: () {
               calculator.addOperator('-');
@@ -103,25 +98,18 @@ class CustomKeyboard extends StatelessWidget {
     );
   }
 
-  _buildNum1to3() {
+  _buildNum1to3(Calculator calculator) {
     return Row(
       mainAxisAlignment: _mainAxisAlignment,
       children: [
-        CustomButton(
-            onPressed: () {
-              calculator.addNum('1');
-            },
-            child: const Text('1')),
-        CustomButton(
-            onPressed: () {
-              calculator.addNum('2');
-            },
-            child: const Text('2')),
-        CustomButton(
-            onPressed: () {
-              calculator.addNum('3');
-            },
-            child: const Text('3')),
+        ...List.generate(
+          3,
+          (index) => CustomButton(
+              onPressed: () {
+                calculator.addNum('${index + 1}');
+              },
+              child: Text('${index + 1}')),
+        ),
         CustomButton(
             onPressed: () {
               calculator.addOperator('+');
@@ -131,7 +119,7 @@ class CustomKeyboard extends StatelessWidget {
     );
   }
 
-  _buildOtherNums() {
+  _buildOtherNums(Calculator calculator) {
     return Row(
       mainAxisAlignment: _mainAxisAlignment,
       children: [
@@ -141,7 +129,11 @@ class CustomKeyboard extends StatelessWidget {
               calculator.addNum('0');
             },
             child: const Text('0')),
-        CustomButton(onPressed: () {}, child: const Text(',')),
+        CustomButton(
+            onPressed: () {
+              calculator.addDot();
+            },
+            child: const Text('.')),
         CustomButton(
           outlined: false,
           onPressed: () {

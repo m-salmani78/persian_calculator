@@ -1,6 +1,8 @@
 import 'package:calculator/constants.dart';
+import 'package:calculator/repo/calculator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class Monitor extends StatelessWidget {
   final TextEditingController controller;
@@ -9,6 +11,7 @@ class Monitor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var result = context.watch<Calculator>().finalResult;
     return Container(
       constraints: const BoxConstraints.expand(),
       decoration: BoxDecoration(
@@ -16,26 +19,34 @@ class Monitor extends StatelessWidget {
         border: Border.all(color: Theme.of(context).primaryColor, width: 2),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
+          const SizedBox(height: 16),
           TextField(
             controller: controller,
             readOnly: true,
             showCursor: true,
             minLines: 1,
-            maxLines: 10,
+            maxLines: 4,
             style: const TextStyle(fontSize: 24),
+            autofocus: true,
             decoration: const InputDecoration(
               border: OutlineInputBorder(borderSide: BorderSide.none),
-              contentPadding: EdgeInsets.all(16),
+              contentPadding: EdgeInsets.symmetric(horizontal: 16),
             ),
           ),
           const Spacer(),
-          const Padding(
-            padding: EdgeInsets.only(bottom: 16, right: 24),
+          Divider(
+            thickness: 1,
+            indent: 16,
+            endIndent: 16,
+            color: Theme.of(context).primaryColor.withOpacity(0.4),
+            height: 0,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
             child: Text(
-              '0',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              result.isEmpty ? '0' : result,
+              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w600),
             ),
           ),
         ],
