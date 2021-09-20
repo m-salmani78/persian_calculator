@@ -1,3 +1,4 @@
+import 'package:calculator/models/operator.dart';
 import 'package:calculator/repo/calculator.dart';
 import 'package:calculator/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
@@ -38,18 +39,20 @@ class CustomKeyboard extends StatelessWidget {
           primary: Colors.red,
         ),
         CustomButton(
-            onPressed: () {
-              //todo
-            },
-            child: const Text('()')),
+          onPressed: () {
+            //todo
+          },
+          child: const Icon(Icons.backspace_outlined),
+          primary: Colors.black,
+        ),
         CustomButton(
             onPressed: () {
-              //todo
+              calculator.addPercent();
             },
             child: const Text('%')),
         CustomButton(
             onPressed: () {
-              calculator.addOperator('÷');
+              calculator.addOperator(Operator.division);
             },
             child: const Text('÷')),
       ],
@@ -70,7 +73,7 @@ class CustomKeyboard extends StatelessWidget {
         ),
         CustomButton(
             onPressed: () {
-              calculator.addOperator('×');
+              calculator.addOperator(Operator.multiplication);
             },
             child: const Text('×')),
       ],
@@ -91,7 +94,7 @@ class CustomKeyboard extends StatelessWidget {
         ),
         CustomButton(
             onPressed: () {
-              calculator.addOperator('-');
+              calculator.addOperator(Operator.subtraction);
             },
             child: const Text('-')),
       ],
@@ -112,7 +115,7 @@ class CustomKeyboard extends StatelessWidget {
         ),
         CustomButton(
             onPressed: () {
-              calculator.addOperator('+');
+              calculator.addOperator(Operator.addition);
             },
             child: const Text('+')),
       ],
