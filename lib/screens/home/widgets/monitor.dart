@@ -24,7 +24,7 @@ class Monitor extends StatelessWidget {
           TextField(
             controller: controller,
             readOnly: true,
-            showCursor: true,
+            // showCursor: true,
             minLines: 1,
             maxLines: 4,
             style: const TextStyle(fontSize: 24),

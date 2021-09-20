@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 
 class Calculator extends ChangeNotifier {
@@ -28,11 +30,7 @@ class Calculator extends ChangeNotifier {
   void addNum(String value) {
     assert(value.length == 1);
     assert(value.compareTo('0') >= 0 && value.compareTo('9') <= 0);
-    if (finalResult.isEmpty) {
-      finalResult = value;
-    } else if (operators.isEmpty) {
-      finalResult += value;
-    } else if (numbers.isNotEmpty && numbers.length >= operators.length) {
+    if (numbers.length > operators.length) {
       numbers[numbers.length - 1] += value;
     } else {
       numbers.add(value);
@@ -41,12 +39,7 @@ class Calculator extends ChangeNotifier {
   }
 
   void addDot() {
-    if (finalResult.isEmpty) {
-      finalResult = '0.';
-    } else if (operators.isEmpty) {
-      if (finalResult.contains('.')) return;
-      finalResult += '.';
-    } else if (numbers.isNotEmpty && numbers.length >= operators.length) {
+    if (numbers.length > operators.length) {
       if (numbers[numbers.length - 1].contains('.')) return;
       numbers[numbers.length - 1] += '.';
     } else {
@@ -55,34 +48,41 @@ class Calculator extends ChangeNotifier {
     controller.text = toString();
   }
 
+  void negativeNum() {
+    final len = numbers.length;
+    if (len > 0) {
+      numbers[len - 1] = (-1 * _cast(numbers[len - 1])).toString();
+    }
+    controller.text = toString();
+  }
+
   void addOperator(String value) {
-    if (finalResult.isEmpty) return;
-    if (operators.length > numbers.length) {
+    if (finalResult.isEmpty && numbers.isEmpty) return;
+    if (operators.isNotEmpty && operators.length >= numbers.length) {
       operators[operators.length - 1] = value;
     } else {
+      if (numbers.isEmpty) numbers.add(finalResult);
       operators.add(value);
     }
     controller.text = toString();
   }
 
   void calculateResult() {
-    if (numbers.isEmpty) return;
-    if (numbers.length != operators.length) throw Exception('invalid input');
-    int index = _findOperator('*', '/');
+    if (numbers.length != operators.length + 1) return;
+    int index = _findOperator('×', '÷');
     while (index >= 0) {
       _merge(index);
-      index = _findOperator('*', '/');
+      index = _findOperator('×', '÷');
     }
     index = _findOperator('+', '-');
     while (index >= 0) {
       _merge(index);
       index = _findOperator('+', '-');
     }
-    var result = finalResult;
-    for (int i = 0; i < numbers.length; i++) {
-      result = oprt(result, numbers[i], operators[i]);
+    finalResult = numbers[0];
+    for (int i = 0; i < operators.length; i++) {
+      finalResult = oprt(finalResult, numbers[i + 1], operators[i]);
     }
-    finalResult = result;
     numbers.clear();
     operators.clear();
     notifyListeners();
@@ -98,15 +98,14 @@ class Calculator extends ChangeNotifier {
   }
 
   void _merge(int index) {
-    String num1 = index > 0 ? numbers[index - 1] : finalResult;
-    String result = oprt(num1, numbers[index], operators[index]);
-    operators.removeAt(index);
-    numbers.removeAt(index);
-    if (index > 0) {
-      numbers[index - 1] = result.toString();
-    } else {
-      finalResult = result;
+    if (index < 0 || index + 1 >= numbers.length) {
+      log('@ _merge Error');
+      return;
     }
+    String result = oprt(numbers[index], numbers[index + 1], operators[index]);
+    operators.removeAt(index);
+    numbers.removeAt(index + 1);
+    numbers[index] = result;
   }
 
   static _cast(String number) {
@@ -118,7 +117,9 @@ class Calculator extends ChangeNotifier {
   }
 
   void clear() {
-    finalResult = '';
+    if (numbers.isEmpty) {
+      finalResult = '';
+    }
     numbers.clear();
     operators.clear();
     controller.clear();
@@ -127,10 +128,18 @@ class Calculator extends ChangeNotifier {
 
   @override
   String toString() {
-    String str = finalResult;
+    if (numbers.isEmpty) return '';
+    String str = numbers[0];
     for (var i = 0; i < operators.length; i++) {
       str += operators[i];
-      if (i < numbers.length) str += numbers[i];
+      if (i + 1 < numbers.length) {
+        final num = numbers[i + 1];
+        if (num[0] == '-') {
+          str += '($num)';
+        } else {
+          str += num;
+        }
+      }
     }
     return str;
   }

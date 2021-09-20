@@ -123,7 +123,11 @@ class CustomKeyboard extends StatelessWidget {
     return Row(
       mainAxisAlignment: _mainAxisAlignment,
       children: [
-        CustomButton(onPressed: () {}, child: const Text('+/-')),
+        CustomButton(
+            onPressed: () {
+              calculator.negativeNum();
+            },
+            child: const Text('+/-')),
         CustomButton(
             onPressed: () {
               calculator.addNum('0');
